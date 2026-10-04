@@ -121,6 +121,7 @@ flashcards:
   - front: Ebstein anomaly — valve and association?
     back: Tricuspid (apically displaced leaflets); maternal lithium
 diagrams: [cardiac-auscultation]
+models: [heart-vh-male]
 related: [pulmonary-valve, heart]
 images:
   - image: gray-493-right-heart-interior

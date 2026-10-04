@@ -142,6 +142,7 @@ flashcards:
   - front: Papillary muscle most prone to rupture after MI?
     back: Posteromedial (single supply from posterior interventricular artery — inferior MI)
 diagrams: [cardiac-auscultation]
+models: [heart-vh-male]
 related: [aortic-valve, heart]
 images:
   - image: gray-495-ventricles-base-valves

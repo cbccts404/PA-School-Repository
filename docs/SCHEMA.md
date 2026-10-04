@@ -49,6 +49,7 @@ content/structures/<region>/<id>.md
 | `flashcards` | | Section 5. List of `{ front, back }` |
 | `images` | | List of `{ image: <id in content/images.yaml>, caption }` |
 | `diagrams` | | List of diagram ids (from `src/diagrams/registry.ts`) |
+| `models` | | List of 3D model ids (from `content/models.yaml`) |
 | `related` | | Extra "See also" entry ids |
 | `sources` | | References consulted for this entry |
 
@@ -141,3 +142,21 @@ flashcards:
 - Required fields: `id`, `file`, `title`, `author`, `source` (the Wikimedia Commons file page), `license`, `alt`.
 - `license` must be `Public domain` or `CC0`. Anything else fails the build.
 - **Never** add images from Netter, Rohen, Grant's or any other copyrighted atlas.
+
+## 3D models (`content/models.yaml`)
+
+An interactive 3D viewer on a structure page: rotate, zoom, tap a part to name it and open its entry, see through
+the walls, color by side and quiz yourself. The page shows a still preview; three.js and the model only download
+when the reader taps **Explore in 3D**.
+
+- Put the `.glb` file in `public/models/` and register it in `content/models.yaml` (the comments at the top of that
+  file explain every field). Show it on a page with `models: [<id>]`.
+- `license` must be `Public domain`, `CC0` or `CC BY 4.0`. CC BY requires credit, so fill in `author`, `work` and
+  `source`: they're shown under the viewer and on `/credits/`.
+- Models must be in body coordinates (+x = the patient's left, +y = superior, +z = anterior). The
+  [Human Reference Atlas 3D library](https://humanatlas.io/3d-reference-library) (CC BY 4.0, built from the Visible
+  Human Project) already is, and its meshes are named per structure, so each one can become a clickable part.
+- Compress the file before adding it. This keeps mesh names, so parts still work:
+  `npx @gltf-transform/cli meshopt input.glb public/models/<id>.glb`
+- `poster` (optional) is a still image shown before the viewer loads. A transparent `.webp` works in both themes.
+- The build fails if the model file, poster or a part's `to` entry doesn't exist.

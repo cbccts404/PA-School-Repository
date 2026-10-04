@@ -1,0 +1,186 @@
+# 3D model registry. Put the .glb file in public/models/ and show the model on a structure page with:
+#   models: [<id>]
+#
+# license must be "Public domain", "CC0" or "CC BY 4.0" (anything else fails the build). CC BY models need
+# author, work and source filled in: they're shown under the viewer and on /credits/.
+#
+# Models are in body coordinates: +x = the patient's left, +y = superior, +z = anterior. The Human Reference
+# Atlas models (https://humanatlas.io/3d-reference-library) already use this frame. Compress a new model with:
+#   npx @gltf-transform/cli meshopt input.glb public/models/<id>.glb
+#
+# parts: one per named mesh ("node") in the .glb. Only listed parts are shown.
+#   group     legend heading; its color (in groups) is the realistic color, `color` overrides it per part
+#   side      right/left heart (or limb): used by the "Color by side" view
+#   internal  sits inside other parts; selecting it turns on see-through mode
+#   to        atlas entry the part links to
+#   note      one or two sentences (Markdown, [[links]] allowed)
+# views: preset camera directions (a named direction or an [x, y, z] vector); `hide` lists part ids to hide.
+# entry: the atlas entry the whole model shows. On other pages, the first part linking to that page is selected.
+
+- id: heart-vh-male
+  file: models/heart-vh-male.glb
+  poster: models/heart-vh-male.webp
+  entry: heart
+  title: "Heart (3D), from the Visible Human male"
+  description: >-
+    Segmented from the Visible Human male, a real body imaged in thin cryosections, so the shapes are true to
+    life. The great vessels, coronary arteries and chordae tendineae aren't part of this model.
+  author: "Kristen Browne and Heidi Schlehlein"
+  work: "3D Reference Organ for Heart, Male v1.3, HuBMAP Human Reference Atlas (2024)"
+  source: https://doi.org/10.48539/HBM564.WKNG.249
+  license: CC BY 4.0
+  licenseNote: "Data from the NLM Visible Human Project. Compressed for the web (meshopt); shapes unchanged."
+  alt: "3D model of the heart seen from the front: the right ventricle forms most of the front, the right atrium is on the left of the image and the left ventricle forms the apex on the right."
+  groups:
+    - name: Chambers
+      color: "#7e2723"
+    - name: Valves
+      color: "#d8c5a0"
+    - name: Papillary muscles
+      color: "#8e2f2a"
+  parts:
+    - id: right-atrium
+      node: VH_M_right_cardiac_atrium
+      label: Right atrium
+      group: Chambers
+      color: "#6b2628"
+      side: right
+      to: heart
+      note: >-
+        Receives the [[superior-vena-cava]], inferior vena cava and coronary sinus; the SA node lies near the SVC
+        opening. Forms the **right border** of the heart on a PA chest X-ray.
+    - id: right-ventricle
+      node: VH_M_heart_right_ventricle
+      label: Right ventricle
+      group: Chambers
+      side: right
+      to: heart
+      note: >-
+        The most **anterior** chamber: it forms most of the sternocostal surface, so it's the chamber most often
+        injured by an anterior stab wound. It doesn't form a border on a PA chest X-ray.
+    - id: left-atrium
+      node: VH_M_left_cardiac_atrium
+      label: Left atrium
+      group: Chambers
+      color: "#6b2628"
+      side: left
+      to: heart
+      note: >-
+        The most **posterior** chamber (most of the base), directly in front of the [[esophagus]]. Receives the
+        four pulmonary veins, whose openings you can see from behind. When enlarged it can cause dysphagia.
+    - id: left-ventricle
+      node: VH_M_heart_left_ventricle
+      label: Left ventricle
+      group: Chambers
+      side: left
+      to: heart
+      note: >-
+        Thickest wall. Forms the **apex** (left 5th intercostal space, midclavicular line) and most of the
+        diaphragmatic surface.
+    - id: interventricular-septum
+      node: VH_M_interventricular_septum
+      label: Interventricular septum
+      group: Chambers
+      to: heart
+      note: >-
+        Mostly muscular. Its small upper **membranous** part is the most common site of a ventricular septal
+        defect.
+    - id: tricuspid-valve
+      node: VH_M_tricuspid_valve
+      label: Tricuspid valve
+      group: Valves
+      side: right
+      internal: true
+      to: tricuspid-valve
+      note: >-
+        Right atrioventricular valve; its chordae run to the anterior, posterior and septal papillary muscles.
+        Heard best at the **left lower sternal border**.
+    - id: pulmonary-valve
+      node: VH_M_pulmonary_valve
+      label: Pulmonary valve
+      group: Valves
+      side: right
+      internal: true
+      to: pulmonary-valve
+      note: >-
+        Three semilunar cusps at the top of the right ventricular outflow tract (infundibulum), the highest of
+        the four valves. Heard best at the **left 2nd intercostal space**.
+    - id: mitral-valve
+      node: VH_M_mitral_valve
+      label: Mitral valve
+      group: Valves
+      side: left
+      internal: true
+      to: mitral-valve
+      note: >-
+        Left atrioventricular valve: two leaflets, anchored by chordae to the anterolateral and posteromedial
+        papillary muscles. Heard best at the **apex**.
+    - id: aortic-valve
+      node: VH_M_aortic_valve
+      label: Aortic valve
+      group: Valves
+      side: left
+      internal: true
+      to: aortic-valve
+      note: >-
+        Three semilunar cusps; the [[right-coronary-artery|right]] and [[left-coronary-artery|left coronary
+        arteries]] arise from the aortic sinuses just above them. Heard best at the **right 2nd intercostal
+        space**.
+    - id: rv-anterior-papillary
+      node: VH_M_papillary_muscle_of_heart_anterior
+      label: Anterior papillary muscle (RV)
+      group: Papillary muscles
+      side: right
+      internal: true
+      to: tricuspid-valve
+      note: >-
+        The largest papillary muscle of the right ventricle. The septomarginal trabecula (moderator band), which
+        carries the right bundle branch, runs from the septum to its base.
+    - id: rv-posterior-papillary
+      node: VH_M_papillary_muscle_of_heart_posterior
+      label: Posterior papillary muscle (RV)
+      group: Papillary muscles
+      side: right
+      internal: true
+      to: tricuspid-valve
+      note: Arises from the inferior (diaphragmatic) wall of the right ventricle and anchors tricuspid chordae.
+    - id: rv-septal-papillary
+      node: VH_M_papillary_muscle_of_heart_medial
+      label: Septal papillary muscle (RV)
+      group: Papillary muscles
+      side: right
+      internal: true
+      to: tricuspid-valve
+      note: Small and variable (sometimes absent). Arises from the interventricular septum and anchors tricuspid chordae.
+    - id: lv-anterolateral-papillary
+      node: VH_M_papillary_muscle_of_heart_anterolateral
+      label: Anterolateral papillary muscle (LV)
+      group: Papillary muscles
+      side: left
+      internal: true
+      to: mitral-valve
+      note: Usually has a **dual** blood supply (LAD and circumflex), so it rarely ruptures. Anchors mitral chordae.
+    - id: lv-posteromedial-papillary
+      node: VH_M_papillary_muscle_of_heart_posteromedial
+      label: Posteromedial papillary muscle (LV)
+      group: Papillary muscles
+      side: left
+      internal: true
+      to: mitral-valve
+      note: >-
+        Usually a **single** supply (the posterior interventricular artery, from the RCA in right dominance), so
+        it's the one that ruptures after an **inferior MI**, causing acute mitral regurgitation.
+  views:
+    - name: Anterior
+      from: anterior
+      note: "Sternocostal surface, mostly right ventricle. The patient's left is on your right."
+    - name: Posterior
+      from: posterior
+      note: "The base, mostly left atrium, with the four pulmonary vein openings. The patient's right is on your right."
+    - name: Inferior
+      from: inferior
+      note: "Diaphragmatic surface, mostly left ventricle. Anterior is at the top; the patient's left is on your right."
+    - name: Valve plane
+      from: [-0.77, 0.26, -0.59] # the base: normal to the valve plane, measured from the model
+      hide: [right-atrium, left-atrium]
+      note: "Atria hidden, looking at the base of the heart onto the valve plane: pulmonary valve at the top, aortic valve in the middle, mitral on your left, tricuspid on your right."

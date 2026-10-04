@@ -4,17 +4,58 @@ import { loadAtlas, structureUrl, url } from '../lib/atlas';
 const atlas = await loadAtlas();
 const images = [...atlas.images.values()].sort((a, b) => a.data.title.localeCompare(b.data.title));
 const usedBy = (id: string) => atlas.structures.filter((s) => s.data.images.some((i) => i.image === id));
+const models = [...atlas.models.values()].sort((a, b) => a.data.title.localeCompare(b.data.title));
+const modelUsedBy = (id: string) => atlas.structures.filter((s) => s.data.models.includes(id));
 ---
 
-<Base title="Image credits" description="Sources and licenses for every image in the atlas.">
+<Base title="Credits & licenses" description="Sources and licenses for every image and 3D model in the atlas.">
   <div class="hero">
-    <h1>Image credits &amp; licenses</h1>
+    <h1>Credits &amp; licenses</h1>
     <p>
       This atlas only uses public-domain images, mainly plates from <em>Gray's Anatomy of the Human Body</em> (20th
       ed., 1918) hosted on Wikimedia Commons, plus original SVG schematics made for this project. The build
       rejects any image whose license isn't public domain or CC0.
     </p>
+    <p>
+      3D models may also be <a href="https://creativecommons.org/licenses/by/4.0/" rel="license noopener">CC BY 4.0</a>,
+      which allows reuse with credit. Each one is credited under its viewer and below.
+    </p>
   </div>
+  {
+    models.length > 0 && (
+      <>
+        <h2>3D models</h2>
+        <ul class="list credits">
+          {models.map((m) => (
+            <li>
+              <div class="credit">
+                {m.data.poster ? <img class="model-thumb" src={url(m.data.poster)} alt={m.data.alt} loading="lazy" /> : <span />}
+                <div>
+                  <strong>{m.data.title}</strong>
+                  <div class="small">
+                    {m.data.author}{m.data.work && <>, <em>{m.data.work}</em></>}. <a href={m.data.source} rel="noopener">Source</a>
+                  </div>
+                  <div class="small muted">
+                    {m.data.license}{m.data.licenseNote && <> · {m.data.licenseNote}</>}
+                  </div>
+                  <div class="small">
+                    Used in:{' '}
+                    {modelUsedBy(m.id).map((s, n) => (
+                      <>
+                        {n > 0 && ', '}
+                        <a href={structureUrl(s)}>{s.data.name}</a>
+                      </>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <h2>Images</h2>
+      </>
+    )
+  }
   {
     images.length ? (
       <ul class="list credits">

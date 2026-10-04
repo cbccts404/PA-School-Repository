@@ -3,7 +3,7 @@
  * Astro integration that runs after `astro build` and writes two files into the
  * output folder:
  *
- *   offline.json — every page and image with its size, used by the
+ *   offline.json — every page and image (3D models count as images) with its size, used by the
  *                  "Save for offline" buttons on the home page.
  *   sw.js        — the service worker, with the app-shell file list and a
  *                  version hash baked in, so each deploy refreshes the cache.
@@ -50,7 +50,7 @@ export default function offline() {
         for (const f of files) {
           if (f === 'sw.js' || f === 'offline.json') continue;
           const size = (await stat(join(root, f))).size;
-          if (f.startsWith('images/')) {
+          if (f.startsWith('images/') || f.startsWith('models/')) {
             images.push(f);
             imagesBytes += size;
             hash.update(`${f}:${size}\n`);

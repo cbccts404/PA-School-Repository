@@ -93,6 +93,7 @@ flashcards:
   - front: Syndrome associated with pulmonic stenosis?
     back: Noonan syndrome (also tetralogy of Fallot, carcinoid)
 diagrams: [cardiac-auscultation]
+models: [heart-vh-male]
 related: [tricuspid-valve, pulmonary-arteries]
 images:
   - image: gray-494-heart-base-valves-above

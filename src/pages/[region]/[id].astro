@@ -5,6 +5,7 @@ import SelfQuiz from '../../components/SelfQuiz.astro';
 import Flashcards from '../../components/Flashcards.astro';
 import Figure from '../../components/Figure.astro';
 import Diagram from '../../components/Diagram.astro';
+import Model3D from '../../components/Model3D.astro';
 import {
   ANATOMY_FIELDS,
   SYSTEM_LABELS,
@@ -218,6 +219,7 @@ const summary = await mdInline(d.summary);
       )
     }
 
+    {d.models.map((id) => <Model3D id={id} entry={entry.id} />)}
     {d.diagrams.map((id) => <Diagram id={id} />)}
     {d.images.map((i) => <Figure image={i.image} caption={i.caption} />)}
   </section>

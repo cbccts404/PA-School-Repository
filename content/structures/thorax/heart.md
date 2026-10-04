@@ -151,6 +151,7 @@ flashcards:
   - front: When do the coronary arteries fill?
     back: Mainly during diastole
 diagrams: [coronary-arteries, cardiac-auscultation]
+models: [heart-vh-male]
 related: [pericardium, cardiac-conduction-system, mediastinum]
 images:
   - image: gray-970-heart-lungs

@@ -195,6 +195,7 @@ const baseFields = {
   flashcards: z.array(flashcard).default([]),
   images: z.array(imageUse).default([]),
   diagrams: z.array(id).default([]),
+  models: z.array(id).default([]),            // ids from content/models.yaml (interactive 3D)
   related: z.array(id).default([]),           // extra "see also" links
   sources: z.array(z.string()).default([]),   // references consulted
 };
@@ -249,6 +250,66 @@ const images = defineCollection({
     licenseNote: z.string().optional(),       // e.g. "PD-US: published before 1931"
     alt: z.string(),
   }),
+});
+
+// 3D models (content/models.yaml). Unlike images, CC BY is allowed: the credit is shown under the viewer.
+const hex = z.string().regex(/^#[0-9a-f]{6}$/i, 'colors look like "#9a3b36"');
+const VIEW_DIRECTIONS = ['anterior', 'posterior', 'superior', 'inferior', 'left', 'right'] as const;
+const modelPart = z.strictObject({
+  id,                                         // used by views[].hide
+  node: z.string(),                           // mesh name inside the .glb
+  label: z.string(),
+  group: z.string(),                          // legend heading; must be listed in groups
+  color: hex.optional(),                      // overrides the group color
+  side: z.enum(['right', 'left']).optional(), // for the "Color by side" view
+  internal: z.boolean().default(false),       // inside other parts: selecting it turns on see-through mode
+  to: id.optional(),                          // atlas entry this part links to
+  note: md.optional(),
+});
+const models = defineCollection({
+  loader: file('./content/models.yaml'),
+  schema: z
+    .strictObject({
+      id,
+      file: z.string(),                       // path under public/, e.g. models/heart-vh-male.glb
+      poster: z.string().optional(),          // still image shown until the viewer loads
+      entry: id,                              // the atlas entry the whole model shows
+      title: z.string(),
+      description: z.string(),
+      author: z.string(),
+      work: z.string().optional(),
+      source: z.url(),
+      license: z.enum(['Public domain', 'CC0', 'CC BY 4.0']),
+      licenseNote: z.string().optional(),
+      alt: z.string(),
+      groups: z.array(z.strictObject({ name: z.string(), color: hex })).min(1),
+      parts: z.array(modelPart).min(1),
+      views: z
+        .array(
+          z.strictObject({
+            name: z.string(),
+            from: z.union([z.enum(VIEW_DIRECTIONS), z.tuple([z.number(), z.number(), z.number()])]),
+            hide: z.array(id).default([]),    // part ids
+            note: z.string().optional(),
+          }),
+        )
+        .default([]),
+    })
+    .superRefine((m, ctx) => {
+      const groups = new Set(m.groups.map((g) => g.name));
+      const parts = new Set<string>();
+      m.parts.forEach((p, i) => {
+        if (parts.has(p.id)) ctx.addIssue({ code: 'custom', message: `duplicate part id "${p.id}"`, path: ['parts', i, 'id'] });
+        parts.add(p.id);
+        if (!groups.has(p.group))
+          ctx.addIssue({ code: 'custom', message: `group "${p.group}" is not listed in groups`, path: ['parts', i, 'group'] });
+      });
+      m.views.forEach((v, i) =>
+        v.hide.forEach((h, j) => {
+          if (!parts.has(h)) ctx.addIssue({ code: 'custom', message: `no part with id "${h}"`, path: ['views', i, 'hide', j] });
+        }),
+      );
+    }),
 });
 
 // Comparison tables (content/tables/*.yaml): cells are Markdown with [[links]].
@@ -329,4 +390,4 @@ const cases = defineCollection({
   }),
 });
 
-export const collections = { structures, regions, images, tables, findings, lesions, roots, cases };
+export const collections = { structures, regions, images, models, tables, findings, lesions, roots, cases };

@@ -83,7 +83,7 @@ const fullTitle = title === 'Anatomy Atlas' ? title : `${title} · Anatomy Atlas
       <a href={url('progress/')}>Your progress &amp; backup</a>
       <a href={url('search/')}>Search</a>
       <a href={url('review/')}>Review queue (verify flags)</a>
-      <a href={url('credits/')}>Image credits &amp; licenses</a>
+      <a href={url('credits/')}>Credits &amp; licenses</a>
     </nav>
 
     <p class="offline-note" id="offline-note" hidden>You're offline — showing pages saved on this device.</p>
@@ -98,7 +98,10 @@ const fullTitle = title === 'Anatomy Atlas' ? title : `${title} · Anatomy Atlas
           A study aid written for PA education. Not a substitute for your course textbook or clinical judgement. Facts
           marked <span class="verify">verify</span> should be checked against your reference text.
         </p>
-        <p>Images are public domain only. <a href={url('credits/')}>See credits &amp; licenses.</a></p>
+        <p>
+          Images are public domain only; 3D models are public domain or CC BY, credited under each one.
+          <a href={url('credits/')}>See credits &amp; licenses.</a>
+        </p>
       </div>
     </footer>
 

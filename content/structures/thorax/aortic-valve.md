@@ -142,6 +142,7 @@ flashcards:
   - front: Which sinuses give rise to the coronary arteries?
     back: "Right aortic sinus → RCA; left aortic sinus → LCA"
 diagrams: [cardiac-auscultation]
+models: [heart-vh-male]
 related: [mitral-valve, thoracic-aorta, heart]
 images:
   - image: gray-497-aortic-valve

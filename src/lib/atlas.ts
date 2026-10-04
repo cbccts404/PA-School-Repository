@@ -4,6 +4,8 @@
  * and collects QA items ({{verify}} flags, links to entries not yet written).
  */
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { Marked } from 'marked';
 import { BODY_SYSTEMS, STRUCTURE_TYPES, type BodySystem, type StructureType } from '../content.config';
 import { diagrams } from '../diagrams/registry';
@@ -11,6 +13,7 @@ import { diagrams } from '../diagrams/registry';
 export type Structure = CollectionEntry<'structures'>;
 export type Region = CollectionEntry<'regions'>;
 export type Image = CollectionEntry<'images'>;
+export type Model = CollectionEntry<'models'>;
 
 // ---------- URLs ----------
 const BASE = import.meta.env.BASE_URL.endsWith('/')
@@ -110,6 +113,7 @@ interface Atlas {
   regions: Region[];
   regionById: Map<string, Region>;
   images: Map<string, Image>;
+  models: Map<string, Model>;
   backlinks: Map<string, Backlink[]>;
   verifyFlags: QAItem[];
   missingLinks: (QAItem & { target: string })[];
@@ -135,10 +139,11 @@ const snippet = (text: string, index: number) => {
 };
 
 async function build(): Promise<Atlas> {
-  const [structures, regions, images] = await Promise.all([
+  const [structures, regions, images, models] = await Promise.all([
     getCollection('structures'),
     getCollection('regions'),
     getCollection('images'),
+    getCollection('models'),
   ]);
   regions.sort((a, b) => a.data.order - b.data.order);
   structures.sort((a, b) => a.data.name.localeCompare(b.data.name));
@@ -146,7 +151,17 @@ async function build(): Promise<Atlas> {
   const byId = new Map(structures.map((s) => [s.id, s]));
   const regionById = new Map(regions.map((r) => [r.id, r]));
   const imageById = new Map(images.map((i) => [i.id, i]));
+  const modelById = new Map(models.map((m) => [m.id, m]));
   const errors: string[] = [];
+
+  for (const m of models) {
+    const where = `content/models.yaml (${m.id})`;
+    for (const f of [m.data.file, m.data.poster])
+      if (f && !existsSync(join(process.cwd(), 'public', f))) errors.push(`${where}: public/${f} does not exist`);
+    if (!byId.has(m.data.entry)) errors.push(`${where}: entry "${m.data.entry}" does not exist`);
+    for (const p of m.data.parts)
+      if (p.to && !byId.has(p.to)) errors.push(`${where}: part "${p.id}" links to missing entry "${p.to}"`);
+  }
 
   const backlinks = new Map<string, Backlink[]>();
   const verifyFlags: QAItem[] = [];
@@ -159,6 +174,8 @@ async function build(): Promise<Atlas> {
       if (!imageById.has(image)) errors.push(`${where}: image "${image}" is not in content/images.yaml`);
     for (const d of s.data.diagrams)
       if (!diagrams[d]) errors.push(`${where}: diagram "${d}" is not in src/diagrams/registry.ts`);
+    for (const m of s.data.models)
+      if (!modelById.has(m)) errors.push(`${where}: model "${m}" is not in content/models.yaml`);
     for (const r of s.data.related)
       if (!byId.has(r)) missingLinks.push({ entry: s, field: 'related', target: r, snippet: '' });
 
@@ -195,7 +212,7 @@ async function build(): Promise<Atlas> {
     throw new Error('Links to missing entries (STRICT_LINKS is set):\n  ' + lines.join('\n  '));
   }
 
-  return { structures, byId, regions, regionById, images: imageById, backlinks, verifyFlags, missingLinks };
+  return { structures, byId, regions, regionById, images: imageById, models: modelById, backlinks, verifyFlags, missingLinks };
 }
 
 // ---------- markdown rendering ----------
